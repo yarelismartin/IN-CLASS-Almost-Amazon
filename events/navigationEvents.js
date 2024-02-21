@@ -1,4 +1,8 @@
+import { emptyBooks, showBooks } from '../pages/books';
 import { signOut } from '../utils/auth';
+import { getBooks, booksOnSale } from '../api/bookData';
+import { showAuthors, emptyAuthors } from '../pages/authors';
+import { getAuthors, favoriteAuthors } from '../api/authorData';
 
 // navigation events
 const navigationEvents = () => {
@@ -8,12 +12,18 @@ const navigationEvents = () => {
 
   // TODO: BOOKS ON SALE
   document.querySelector('#sale-books').addEventListener('click', () => {
-    console.warn('CLICKED SALE BOOKS');
+    booksOnSale().then((response) => {
+      if (response.length > 0) {
+        showBooks(response);
+      } else {
+        emptyBooks();
+      }
+    });
   });
 
   // TODO: ALL BOOKS
   document.querySelector('#all-books').addEventListener('click', () => {
-    console.warn('CLICKED ALL BOOKS');
+    getBooks().then(showBooks);
   });
 
   // FIXME: STUDENTS Create an event listener for the Authors
@@ -21,7 +31,23 @@ const navigationEvents = () => {
   // 2. Convert the response to an array because that is what the makeAuthors function is expecting
   // 3. If the array is empty because there are no authors, make sure to use the emptyAuthor function
   document.querySelector('#authors').addEventListener('click', () => {
-    console.warn('CLICKED AUTHORS');
+    getAuthors().then((response) => {
+      if (response.length > 0) {
+        showAuthors(response);
+      } else {
+        emptyAuthors('No Authors');
+      }
+    });
+  });
+
+  document.querySelector('#fav-authors').addEventListener('click', () => {
+    favoriteAuthors().then((response) => {
+      if (response.length > 0) {
+        showAuthors(response);
+      } else {
+        emptyAuthors('No Favorite Authors');
+      }
+    });
   });
 
   // STRETCH: SEARCH
