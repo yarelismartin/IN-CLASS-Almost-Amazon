@@ -1,9 +1,14 @@
-import { deleteBook, getBooks } from '../api/bookData';
+import { deleteBook, getBooks, getSingleBook } from '../api/bookData';
 import { showBooks } from '../pages/books';
 import {
-  deleteSingleAuthor, getAuthors, favoritingOneAuthor,
+  getAuthors, favoritingOneAuthor, getSingleAuthor, unfavoritingOneAuthor
 } from '../api/authorData';
 import { showAuthors } from '../pages/authors';
+import addBookForm from '../components/forms/addBookForm';
+import addAuthorForm from '../components/forms/addAuthorForm';
+import { deleteAuthorAndAuthorBooks, getAuthorDetails, getBookDetails } from '../api/mergedData';
+import viewBook from '../pages/viewBook';
+import viewAuthor from '../pages/viewAuhtor';
 
 const domEvents = () => {
   document.querySelector('#main-container').addEventListener('click', (e) => {
@@ -13,7 +18,6 @@ const domEvents = () => {
       if (window.confirm('Want to delete?')) {
         console.warn('CLICKED DELETE BOOK', e.target.id);
         const [, firebaseKey] = e.target.id.split('--');
-
         deleteBook(firebaseKey).then(() => {
           getBooks().then(showBooks);
         });
@@ -22,18 +26,24 @@ const domEvents = () => {
 
     // TODO: CLICK EVENT FOR SHOWING FORM FOR ADDING A BOOK
     if (e.target.id.includes('add-book-btn')) {
-      console.warn('ADD BOOK');
+      addBookForm();
     }
 
     // TODO: CLICK EVENT EDITING/UPDATING A BOOK
     if (e.target.id.includes('edit-book-btn')) {
-      console.warn('EDIT BOOK', e.target.id);
-      console.warn(e.target.id.split('--'));
+      const [, firebaseKey] = (e.target.id.split('--'));
+      console.warn(firebaseKey, 'is this working??');
+      getSingleBook(firebaseKey).then(addBookForm);
     }
     // TODO: CLICK EVENT FOR VIEW BOOK DETAILS
     if (e.target.id.includes('view-book-btn')) {
       console.warn('VIEW BOOK', e.target.id);
-      console.warn(e.target.id.split('--'));
+      const [, firebaseKey] = (e.target.id.split('--'));
+
+      getBookDetails(firebaseKey).then((bookAuthorObj) => {
+        console.warn(bookAuthorObj);
+        viewBook(bookAuthorObj);
+      });
     }
 
     // FIXME: ADD CLICK EVENT FOR DELETING AN AUTHOR
@@ -43,63 +53,66 @@ const domEvents = () => {
         console.warn('DELETE AUTHOR', e.target.id);
         const [, firebaseKey] = e.target.id.split('--');
 
-        deleteSingleAuthor(firebaseKey).then(() => {
+        deleteAuthorAndAuthorBooks(firebaseKey).then(() => {
           getAuthors().then(showAuthors);
         });
       }
     }
 
-    // FIXME: ADD CLICK EVENT FOR FAVORITING AN AUTHOR
+    // FIXME: FAVORITING AND UNFAVORITING AN ARTHUR
+
     if (e.target.id.includes('fav-author-btn')) {
-      // eslint-disable-next-line no-alert
-      if (window.confirm('Want to favorite author?')) {
-        console.warn('FAVORITE AUTHOR', e.target.id);
-        const [, firebaseKey] = e.target.id.split('--');
+      const [, firebaseKey] = e.target.id.split('--');
+      const favoritedCard = e.target.classList.contains('favorited');
+      const confirmationMessage = favoritedCard
+        // eslint-disable-next-line no-alert
+        ? window.confirm('Want to unfavorite author?')
+        // eslint-disable-next-line no-alert
+        : window.confirm('Want to favorite author?');
 
-        favoritingOneAuthor(firebaseKey).then(() => {
+      // eslint-disable-next-line no-nested-ternary
+      const toggleFavorite = favoritedCard && confirmationMessage ? unfavoritingOneAuthor
+        : !favoritedCard && confirmationMessage ? favoritingOneAuthor
+          : null;
+      if (toggleFavorite) {
+        toggleFavorite(firebaseKey).then(() => {
           getAuthors().then(showAuthors);
         });
       }
     }
-
-    // // UNFAV an Author
-    // if (e.target.id && e.target.id.includes('fav-author-btn')) {
-    //   // eslint-disable-next-line no-alert
-    //   if (window.confirm('Want to unfavorite author?')) {
-    //     console.warn('UNFAVORITE AUTHOR', e.target.id);
-    //     const [, firebaseKey] = e.target.id.split('--');
-
-    //     unfavoritingOneAuthor(firebaseKey).then(() => {
-    //       getAuthors().then(showAuthors);
-    //     });
-    //   }
-    // }
-
-    // if (e.target.id.includes('fav-author-btn')) {
-    //   const [, firebaseKey] = e.target.id.split('--');
-    //   const favoritedCard = e.target.classList.contains('favorited');
-    //   const confirmationMessage = favoritedCard
-    //     // eslint-disable-next-line no-alert
-    //     ? window.confirm('Want to unfavorite author?')
-    //     // eslint-disable-next-line no-alert
-    //     : window.confirm('Want to favorite author?');
-
-    //   // eslint-disable-next-line no-nested-ternary
-    //   const toggleFavorite = favoritedCard && confirmationMessage ? unfavoritingOneAuthor
-    //     : !favoritedCard && confirmationMessage ? favoritingOneAuthor
-    //       : null;
-    //   if (toggleFavorite) {
-    //     toggleFavorite(firebaseKey).then(() => {
-    //       getAuthors().then(showAuthors);
-    //     });
-    //   }
-    // }
     // FIXME: ADD CLICK EVENT FOR SHOWING FORM FOR ADDING AN AUTHOR
     if (e.target.id.includes('add-author-btn')) {
-      console.warn('ADD AUTHOR');
+      addAuthorForm();
     }
     // FIXME: ADD CLICK EVENT FOR EDITING AN AUTHOR
+    if (e.target.id.includes('update-author')) {
+      console.warn('click to edit author');
+      const [, firebaseKey] = (e.target.id.split('--'));
+      console.warn(firebaseKey, 'hello??');
+      getSingleAuthor(firebaseKey).then(addAuthorForm);
+      // getSingleAuthor(firebaseKey).then((authorObj) => addAuthorForm(authorObj));
+    }
+
+    if (e.target.id.includes('view-author-btn')) {
+      const [, firebaseKey] = (e.target.id.split('--'));
+      getAuthorDetails(firebaseKey);
+
+      getAuthorDetails(firebaseKey).then((authorBooksObj) => {
+        console.warn(authorBooksObj);
+        viewAuthor(authorBooksObj);
+      });
+    }
   });
 };
+
+// if (e.target.id.includes('view-book-btn')) {
+//   console.warn('VIEW BOOK', e.target.id);
+//   const [, firebaseKey] = (e.target.id.split('--'));
+
+//   getBookDetails(firebaseKey).then((bookAuthorObj) => {
+//     console.warn(bookAuthorObj);
+//     viewBook(bookAuthorObj);
+//   });
+// }
 
 export default domEvents;
