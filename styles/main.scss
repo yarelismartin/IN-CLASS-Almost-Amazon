@@ -65,24 +65,25 @@ body {
     margin: auto;
     justify-content: center;
 
-    .card {
-      width: 300px;
-      margin: 5px;
-
-      .sale-badge {
-        font-size: 1em;
-        background-color: blue;
-      }
-    }
-
     .table {
       margin: 10px;
       width: 80%;
       margin: 0 auto;
     }
+    .card {
+      width: 300px;
+      margin: 5px;
+
+      
+    }
   }
 }
 
+.sale-badge {
+        font-size: 1em;
+        background-color: blue;
+      }
+      
 #view {
   width: 90%;
   margin: auto;
@@ -102,3 +103,15 @@ body {
 .hover-heart:hover {
   color: #c1121f !important;
 }
+
+#books-container{
+  display: flex;
+}
+.view-author-card{
+  background-color: black;
+  color: white;
+  }
+  .view-author-card-email{
+    color:white !important;
+    font-weight: lighter;
+  }
