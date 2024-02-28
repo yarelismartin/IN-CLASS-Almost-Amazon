@@ -10,7 +10,7 @@ import { deleteAuthorAndAuthorBooks, getAuthorDetails, getBookDetails } from '..
 import viewBook from '../pages/viewBook';
 import viewAuthor from '../pages/viewAuhtor';
 
-const domEvents = () => {
+const domEvents = (uid) => {
   document.querySelector('#main-container').addEventListener('click', (e) => {
     // TODO: CLICK EVENT FOR DELETING A BOOK
     if (e.target.id.includes('delete-book')) {
@@ -19,21 +19,23 @@ const domEvents = () => {
         console.warn('CLICKED DELETE BOOK', e.target.id);
         const [, firebaseKey] = e.target.id.split('--');
         deleteBook(firebaseKey).then(() => {
-          getBooks().then(showBooks);
+          getBooks(uid).then(showBooks);
         });
       }
     }
 
     // TODO: CLICK EVENT FOR SHOWING FORM FOR ADDING A BOOK
     if (e.target.id.includes('add-book-btn')) {
-      addBookForm();
+      addBookForm({}, uid);
+      /* had an issue with adding books b/c i wasnt passing it the uid param
+      but that was because i didnt have an obj to pass it so to get around that you make it an empty obj */
     }
 
     // TODO: CLICK EVENT EDITING/UPDATING A BOOK
     if (e.target.id.includes('edit-book-btn')) {
       const [, firebaseKey] = (e.target.id.split('--'));
       console.warn(firebaseKey, 'is this working??');
-      getSingleBook(firebaseKey).then(addBookForm);
+      getSingleBook(firebaseKey).then((bookObj) => addBookForm(bookObj, uid));
     }
     // TODO: CLICK EVENT FOR VIEW BOOK DETAILS
     if (e.target.id.includes('view-book-btn')) {
@@ -54,7 +56,7 @@ const domEvents = () => {
         const [, firebaseKey] = e.target.id.split('--');
 
         deleteAuthorAndAuthorBooks(firebaseKey).then(() => {
-          getAuthors().then(showAuthors);
+          getAuthors(uid).then(showAuthors);
         });
       }
     }
@@ -76,7 +78,7 @@ const domEvents = () => {
           : null;
       if (toggleFavorite) {
         toggleFavorite(firebaseKey).then(() => {
-          getAuthors().then(showAuthors);
+          getAuthors(uid).then(showAuthors);
         });
       }
     }
@@ -89,7 +91,7 @@ const domEvents = () => {
       console.warn('click to edit author');
       const [, firebaseKey] = (e.target.id.split('--'));
       console.warn(firebaseKey, 'hello??');
-      getSingleAuthor(firebaseKey).then(addAuthorForm);
+      getSingleAuthor(firebaseKey).then((authorObj) => addAuthorForm(authorObj, uid));
       // getSingleAuthor(firebaseKey).then((authorObj) => addAuthorForm(authorObj));
     }
 

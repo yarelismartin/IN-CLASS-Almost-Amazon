@@ -2,15 +2,20 @@ import clearDom from '../utils/clearDom';
 import renderToDOM from '../utils/renderToDom';
 import '@fortawesome/fontawesome-free';
 
-const emptyBooks = () => {
-  const domString = '<h1>No Books</h1>';
+const emptyBooks = (message, addBtn) => {
+  const addBookBtn = addBtn ? '<button class="btn btn-success btn-lg mb-4" id="add-book-btn">Add A Book</button>' : '';
+  const domString = `
+  <div> 
+    ${addBookBtn} 
+    <h1>${message}</h1>
+  </div>`;
   renderToDOM('#store', domString);
 };
 
 const showBooks = (array) => {
   clearDom();
   if (array.length <= 0) {
-    emptyBooks();
+    emptyBooks('No Books', true);
   } else {
     const btnString = '<button class="btn btn-success btn-lg mb-4" id="add-book-btn">Add A Book</button>';
     renderToDOM('#add-button', btnString);

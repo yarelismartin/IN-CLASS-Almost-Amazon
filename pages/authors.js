@@ -3,9 +3,16 @@ import renderToDOM from '../utils/renderToDom';
 import '../styles/main.scss';
 import '@fortawesome/fontawesome-free';
 
-const emptyAuthors = (message) => {
-  const domString = `<h1>${message}</h1>`;
-  renderToDOM('#store', domString);
+const emptyAuthors = (message, addBtn) => {
+  clearDom();
+  const addAuthorBtn = addBtn ? '<button class="btn btn-success btn-lg mb-4" id="add-author-btn">Add An Author</button>' : '';
+  const domString = `
+  <div>
+    ${addAuthorBtn}
+    <h1>${message}</h1>
+  </div>
+  `;
+  renderToDOM('#author_store', domString);
 };
 
 const showAuthors = (array) => {
@@ -37,7 +44,7 @@ const showAuthors = (array) => {
     </div>
     `;
     });
-    renderToDOM('#store', domString);
+    renderToDOM('#author_store', domString);
   }
 };
 
