@@ -16,6 +16,7 @@ import { getOrders, singleOrder, deleteOrder } from '../api/orderData';
 import { showOrders } from '../pages/orders';
 import viewOrder from '../pages/viewOrder';
 import { showBooksNotInOrder } from '../pages/booksNotInOrder';
+import { createOrderBook, updateOrderBook } from '../api/orderBookData';
 
 const domEvents = (uid) => {
   document.querySelector('#main-container').addEventListener('click', (e) => {
@@ -147,13 +148,13 @@ const domEvents = (uid) => {
     }
     if (e.target.id.includes('add-book-to-order-btn')) {
       const [, bookFirebaseKey, orderFirebaseKey] = e.target.id.split('--');
-      const payload ={
+      const payload = {
         order_id: orderFirebaseKey,
         book_id: bookFirebaseKey,
         uid
       };
       // CREATE ORDERBOOK
-       createOrderBook(payload).then(({ name }) => {
+      createOrderBook(payload).then(({ name }) => {
         // PATCH FIREBASEKEY
         const patchPayload = { firebaseKey: name };
 
