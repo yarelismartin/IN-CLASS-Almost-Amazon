@@ -12,11 +12,11 @@ const emptyAuthors = (message, addBtn) => {
     <h1>${message}</h1>
   </div>
   `;
-  renderToDOM('#author_store', domString);
+  renderToDOM('#store', domString);
 };
 
-const showAuthors = (array) => {
-  clearDom();
+const showAuthors = (array, clear = true) => {
+  if (clear) clearDom();
   if (array.length <= 0) {
     emptyAuthors('No Anuthors');
   } else {
@@ -44,7 +44,7 @@ const showAuthors = (array) => {
     </div>
     `;
     });
-    renderToDOM('#author_store', domString);
+    renderToDOM('#store', domString);
   }
 };
 

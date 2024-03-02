@@ -6,9 +6,16 @@ import {
 import { showAuthors } from '../pages/authors';
 import addBookForm from '../components/forms/addBookForm';
 import addAuthorForm from '../components/forms/addAuthorForm';
-import { deleteAuthorAndAuthorBooks, getAuthorDetails, getBookDetails } from '../api/mergedData';
+import {
+  deleteAuthorAndAuthorBooks, getAuthorDetails, getBookDetails, getBooksNotInTheOrder, getOrderAndBooks
+} from '../api/mergedData';
 import viewBook from '../pages/viewBook';
 import viewAuthor from '../pages/viewAuhtor';
+import addOrderForm from '../components/forms/addOrderForm';
+import { getOrders, singleOrder, deleteOrder } from '../api/orderData';
+import { showOrders } from '../pages/orders';
+import viewOrder from '../pages/viewOrder';
+import { showBooksNotInOrder } from '../pages/booksNotInOrder';
 
 const domEvents = (uid) => {
   document.querySelector('#main-container').addEventListener('click', (e) => {
@@ -102,6 +109,60 @@ const domEvents = (uid) => {
       getAuthorDetails(firebaseKey).then((authorBooksObj) => {
         console.warn(authorBooksObj);
         viewAuthor(authorBooksObj);
+      });
+    }
+
+    // FIXME: ADD CLICK EVENT FOR ADDING AN ORDER
+    if (e.target.id.includes('add-order-btn')) {
+      console.warn('you are creating an order');
+      addOrderForm();
+    }
+
+    if (e.target.id.includes('edit-order-btn')) {
+      const [, firebaseKey] = (e.target.id.split('--'));
+      console.warn(firebaseKey, 'is this working??');
+      singleOrder(firebaseKey).then((orderObj) => addOrderForm(orderObj, uid));
+    }
+
+    if (e.target.id.includes('delete-order-btn')) {
+      // eslint-disable-next-line no-alert
+      if (window.confirm('Want to delete?')) {
+        console.warn('DELETE order', e.target.id);
+        const [, firebaseKey] = e.target.id.split('--');
+
+        deleteOrder(firebaseKey).then(() => {
+          getOrders(uid).then(showOrders);
+        });
+      }
+    }
+    // Click Event to view order details;
+    if (e.target.id.includes('view-order-btn')) {
+      const [, firebaseKey] = e.target.id.split('--');
+      console.warn(getOrderAndBooks(firebaseKey).then(viewOrder));
+      getOrderAndBooks(firebaseKey).then(viewOrder);
+    }
+    if (e.target.id.includes('show-books-not-in-order-btn')) {
+      const [, orderFirebaseKey] = e.target.id.split('--');
+      getBooksNotInTheOrder(orderFirebaseKey, uid).then((booksArray) => showBooksNotInOrder(booksArray, orderFirebaseKey));
+    }
+    if (e.target.id.includes('add-book-to-order-btn')) {
+      const [, bookFirebaseKey, orderFirebaseKey] = e.target.id.split('--');
+      const payload ={
+        order_id: orderFirebaseKey,
+        book_id: bookFirebaseKey,
+        uid
+      };
+      // CREATE ORDERBOOK
+       createOrderBook(payload).then(({ name }) => {
+        // PATCH FIREBASEKEY
+        const patchPayload = { firebaseKey: name };
+
+        // UPDATE ORDER BOOK
+        updateOrderBook(patchPayload).then(() => {
+          // CALL GET ALL BOOKS NOT IN THE ORDER SO THE BOOK JUST ADDED WILL NOT SHOW IN VIEW
+          // YOU CAN ONLY ADD BOOKS TO ORDER FROM THE showBooksNotInOrder VIEW
+          getBooksNotInTheOrder(orderFirebaseKey, uid).then((booksArray) => showBooksNotInOrder(booksArray, orderFirebaseKey));
+        });
       });
     }
   });

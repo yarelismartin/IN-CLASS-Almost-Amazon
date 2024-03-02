@@ -5,6 +5,8 @@ import { showAuthors, emptyAuthors } from '../pages/authors';
 import { getAuthors, favoriteAuthors } from '../api/authorData';
 import clearDom from '../utils/clearDom';
 import renderToDOM from '../utils/renderToDom';
+import { getOrders } from '../api/orderData';
+import { showOrders } from '../pages/orders';
 
 // navigation events
 const navigationEvents = (uid) => {
@@ -14,6 +16,7 @@ const navigationEvents = (uid) => {
 
   // TODO: BOOKS ON SALE
   document.querySelector('#sale-books').addEventListener('click', () => {
+    clearDom();
     booksOnSale(uid).then((response) => {
       if (response.length > 0) {
         showBooks(response);
@@ -67,12 +70,11 @@ const navigationEvents = (uid) => {
       // IF THE SEARCH DOESN'T RETURN ANYTHING, SHOW THE EMPTY STORE
       // OTHERWISE SHOW THE STORE
       document.querySelector('#search').value = '';
-      searchStore(searchValue, uid).then(({ authors, books }) => {
+      searchStore(uid, searchValue).then(({ books, authors }) => {
         if (books.length > 0 || authors.length > 0) {
-          clearDom();
           console.warn(books, authors);
-          showAuthors(authors);
-          showBooks(books);
+          showAuthors(authors, false);
+          showBooks(books, false);
         } else {
           clearDom();
           const domString = '<h1> No Results</h1>';
@@ -80,6 +82,12 @@ const navigationEvents = (uid) => {
         }
       });
     }
+  });
+
+  document.querySelector('#orders').addEventListener('click', () => {
+    clearDom();
+    console.warn('this click works');
+    getOrders(uid).then(showOrders);
   });
 };
 

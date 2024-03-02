@@ -12,8 +12,8 @@ const emptyBooks = (message, addBtn) => {
   renderToDOM('#store', domString);
 };
 
-const showBooks = (array) => {
-  clearDom();
+const showBooks = (array, clear = true) => {
+  if (clear) clearDom();
   if (array.length <= 0) {
     emptyBooks('No Books', true);
   } else {
