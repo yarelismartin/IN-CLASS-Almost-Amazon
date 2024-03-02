@@ -7,6 +7,9 @@ import navigationEvents from '../events/navigationEvents';
 import { showBooks } from '../pages/books';
 import { getBooks } from '../api/bookData';
 
+/* In our StarApp we need to pass it the uid parameter
+the functions that will get the uid are what will be
+personalized to the user */
 const startApp = (uid) => {
   domBuilder(); // BUILD THE DOM
   domEvents(uid); // ADD THE EVENT LISTENTERS TO THE DOM

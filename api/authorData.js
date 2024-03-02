@@ -88,15 +88,18 @@ const getAuthorBooks = (firebaseKey) => new Promise((resolve, reject) => {
 });
 
 // TODO: FILTER FAV AUTHORS
-const favoriteAuthors = () => new Promise((resolve, reject) => {
-  fetch(`${endpoint}/authors.json?orderBy="favorite"&equalTo=true`, {
+const favoriteAuthors = (uid) => new Promise((resolve, reject) => {
+  fetch(`${endpoint}/authors.json?orderBy="uid"&equalTo="${uid}"`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
     },
   })
     .then((response) => response.json())
-    .then((data) => resolve(Object.values(data)))
+    .then((data) => {
+      const favoriteAuthor = Object.values(data).filter((obj) => obj.favorite);
+      resolve(favoriteAuthor);
+    })
     .catch(reject);
 });
 
@@ -119,15 +122,8 @@ const favoritingOneAuthor = (firebaseKey) => new Promise((resolve, reject) => {
     body: JSON.stringify(favoriteData),
   })
     .then((response) => response.json()) // Parse the JSON response
-    .then((data) => {
-      if (data) {
-        const favoriteAuthor = Object.values(data.filter((obj) => obj.favorite));
-        resolve(favoriteAuthor);
-      } else {
-        resolve([]);
-      }
-    })
-    .catch(reject);
+    .then((data) => resolve(data))
+    .catch(reject); // Reject the promise if there's an error
 });
 
 // TODO: FILTER uNFAV AUTHORS

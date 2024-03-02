@@ -1,3 +1,5 @@
+// These are the pages that we need to clear every time an event occurs
+
 const clearDom = () => {
   document.querySelector('#store').innerHTML = '';
   document.querySelector('#add-button').innerHTML = '';

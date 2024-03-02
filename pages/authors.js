@@ -3,13 +3,20 @@ import renderToDOM from '../utils/renderToDom';
 import '../styles/main.scss';
 import '@fortawesome/fontawesome-free';
 
-const emptyAuthors = (message) => {
-  const domString = `<h1>${message}</h1>`;
+const emptyAuthors = (message, addBtn) => {
+  clearDom();
+  const addAuthorBtn = addBtn ? '<button class="btn btn-success btn-lg mb-4" id="add-author-btn">Add An Author</button>' : '';
+  const domString = `
+  <div>
+    ${addAuthorBtn}
+    <h1>${message}</h1>
+  </div>
+  `;
   renderToDOM('#store', domString);
 };
 
-const showAuthors = (array) => {
-  clearDom();
+const showAuthors = (array, clear = true) => {
+  if (clear) clearDom();
   if (array.length <= 0) {
     emptyAuthors('No Anuthors');
   } else {

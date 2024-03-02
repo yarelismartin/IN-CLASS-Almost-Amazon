@@ -1,11 +1,12 @@
 import client from '../utils/client';
+import { getAuthors } from './authorData';
 // API CALLS FOR BOOKS
 
 const endpoint = client.databaseURL;
 
 // TODO: GET BOOKS
-const getBooks = () => new Promise((resolve, reject) => {
-  fetch(`${endpoint}/books.json`, {
+const getBooks = (uid) => new Promise((resolve, reject) => {
+  fetch(`${endpoint}/books.json?orderBy="uid"&equalTo="${uid}"`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -77,19 +78,38 @@ const updateBook = (payload) => new Promise((resolve, reject) => {
 });
 
 // TODO: FILTER BOOKS ON SALE
-const booksOnSale = () => new Promise((resolve, reject) => {
-  fetch(`${endpoint}/books.json?orderBy="sale"&equalTo=true`, {
+const booksOnSale = (uid) => new Promise((resolve, reject) => {
+  fetch(`${endpoint}/books.json?orderBy="uid"&equalTo="${uid}"`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
     },
   })
     .then((response) => response.json())
-    .then((data) => resolve(Object.values(data)))
+    .then((data) => {
+      const saleBooks = Object.values(data).filter((obj) => obj.sale);
+      resolve(saleBooks);
+    })
     .catch(reject);
 });
 
-// TODO: STRETCH...SEARCH BOOKS
+// TODO: STRETCH...SEARCH STORE
+const searchStore = async (uid, searchValue) => {
+  const allBooks = await getBooks(uid);
+  const allAuthors = await getAuthors(uid);
+  const filteredBooks = await allBooks.filter((book) => (
+    book.title.toLowerCase().includes(searchValue)
+  || book.description.toLowerCase().includes(searchValue)
+  || book.price.includes(parseInt(searchValue, 10))
+  ));
+  const filteredAuthors = await allAuthors.filter((author) => (
+    author.first_name.toLowerCase().includes(searchValue)
+    || author.last_name.toLowerCase().includes(searchValue)
+    || author.email.toLowerCase().includes(searchValue)
+  ));
+
+  return { authors: filteredAuthors, books: filteredBooks };
+};
 
 export {
   getBooks,
@@ -97,5 +117,6 @@ export {
   booksOnSale,
   deleteBook,
   getSingleBook,
-  updateBook
+  updateBook,
+  searchStore,
 };
